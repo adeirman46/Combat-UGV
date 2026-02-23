@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<!-- =================================================================================== -->
+<!-- UGV PINDAD — TRACKED VEHICLE WITH VELODYNE VLP-16 (Gz Fortress)                     -->
+<!-- =================================================================================== -->
+<!-- Tank-style tracked vehicle. STL mesh has all visual content.                         -->
+<!--                                                                                     -->
+<!-- STL ANALYSIS RESULTS:                                                                -->
+<!--   Mesh extents (m): X=0→2.390, Y=0→2.308, Z=0→2.243                                -->
+<!--   Mesh center:      (1.195, 1.154, 1.122)                                           -->
+<!--   Bottom Z = 0.0 (track bottoms at origin)                                          -->
+<!--   Front of vehicle faces LOW X (toward X=0 in STL)                                  -->
+<!--   Left track Y center: 2.035, Right track Y center: 0.277                           -->
+<!--   Track separation: 1.758m, half = 0.879m                                           -->
+<!--   Ground contact X range: 0.523 → 1.898 (centered: ±0.69)                           -->
+<!--                                                                                     -->
+<!-- TRANSFORM APPLIED:                                                                   -->
+<!--   1. Rotate mesh 180° (pi) around Z so front faces +X (ROS forward)                 -->
+<!--   2. Translate (1.195, 1.154, -wheel_radius) to center and ground-align              -->
+<!--                                                                                     -->
+<!-- WHEEL LAYOUT (3 per side, all invisible):                                            -->
+<!--   Rear  (x=-0.70) = DRIVE SPROCKETS (high friction, powered by diff-drive)          -->
+<!--   Mid   (x= 0.00) = PASSIVE rollers (low friction)                                  -->
+<!--   Front (x=+0.67) = PASSIVE idlers  (low friction)                                  -->
+<!-- =================================================================================== -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ugv_pindad_lidar">
+
+  <!-- ================================================================== -->
+  <!-- 1. PROPERTIES (from STL analysis)                                   -->
+  <!-- ================================================================== -->
+
+  <!-- Chassis -->
+  <xacro:property name="chassis_length"   value="2.39"/>
+  <xacro:property name="chassis_width"    value="2.31"/>
+  <xacro:property name="chassis_height"   value="0.40"/>
+  <xacro:property name="chassis_mass"     value="200.0"/>
+  <xacro:property name="total_height"     value="2.2434"/>
+
+  <!-- Drive wheels — sized to match mesh road wheels -->
+  <xacro:property name="wheel_radius"     value="0.20"/>
+  <xacro:property name="wheel_width"      value="0.35"/>
+  <xacro:property name="drive_wheel_mass" value="20.0"/>
+  <xacro:property name="idle_wheel_mass"  value="5.0"/>
+
+  <!-- Wheel placement (from STL ground-contact & track center analysis) -->
+  <xacro:property name="wheel_y_offset"   value="0.879"/>
+  <xacro:property name="rear_x"           value="-0.70"/>
+  <xacro:property name="mid_x"            value="0.00"/>
+  <xacro:property name="front_x"          value="0.67"/>
+
+  <!-- Mesh (STL center + rotation offsets) -->
+  <xacro:property name="mesh_scale"       value="0.001 0.001 0.001"/>
+
+
+  <!-- ================================================================== -->
+  <!-- MACRO: Passive wheel (invisible, LOW friction for pivot turns)       -->
+  <!-- ================================================================== -->
+  <xacro:macro name="passive_wheel" params="name x_pos y_pos">
+    <link name="${name}_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${idle_wheel_mass}"/>
+        <origin xyz="0 0 0"/>
+        <inertia
+          ixx="${(1.0/12.0) * idle_wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+          ixy="0" ixz="0"
+          iyy="${(1.0/12.0) * idle_wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+          iyz="0"
+          izz="${0.5 * idle_wheel_mass * wheel_radius * wheel_radius}"/>
+      </inertial>
+    </link>
+
+    <joint name="${name}_joint" type="continuous">
+      <parent link="base_link"/>
+      <child  link="${name}_link"/>
+      <origin xyz="${x_pos} ${y_pos} 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="0.1" friction="0.1"/>
+      <limit effort="0" velocity="20.0"/>
+    </joint>
+
+    <gazebo reference="${name}_link">
+      <mu1>0.3</mu1>
+      <mu2>0.1</mu2>
+      <kp>1e6</kp>
+      <kd>100</kd>
+    </gazebo>
+  </xacro:macro>
+
+
+  <!-- ================================================================== -->
+  <!-- 2. BASE LINKS                                                       -->
+  <!-- ================================================================== -->
+
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child  link="base_link"/>
+    <!-- Lift base_link by wheel_radius so wheel bottoms sit at z=0 (ground) -->
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <!-- VISUAL: STL mesh, rotated 180° so front faces +X (ROS forward) -->
+    <!-- After rotation: translate (1.195, 1.154, -wheel_radius) to center -->
+    <!-- and align mesh bottom Z=0 with ground plane                       -->
+    <visual>
+      <origin xyz="1.195 1.154 ${-wheel_radius}" rpy="0 0 ${pi}"/>
+      <geometry>
+        <mesh filename="file://$(find ugv_pindad_bringup)/meshes/UGV.stl" scale="${mesh_scale}"/>
+      </geometry>
+      <material name="military_green">
+        <color rgba="0.30 0.35 0.25 1.0"/>
+      </material>
+    </visual>
+
+    <!-- Collision: box raised well above wheel contact to avoid drag -->
+    <collision>
+      <origin xyz="0 0 ${chassis_height / 2.0 + 0.15}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length * 0.7} ${chassis_width * 0.5} ${chassis_height * 0.5}"/>
+      </geometry>
+    </collision>
+
+    <!-- Inertia: center of mass LOW for stability -->
+    <inertial>
+      <mass value="${chassis_mass}"/>
+      <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+      <inertia
+        ixx="${(1.0/12.0) * chassis_mass * (chassis_width * chassis_width + chassis_height * chassis_height)}"
+        ixy="0" ixz="0"
+        iyy="${(1.0/12.0) * chassis_mass * (chassis_length * chassis_length + chassis_height * chassis_height)}"
+        iyz="0"
+        izz="${(1.0/12.0) * chassis_mass * (chassis_length * chassis_length + chassis_width * chassis_width)}"/>
+    </inertial>
+  </link>
+
+  <gazebo reference="base_link">
+    <mu1>0.5</mu1>
+    <mu2>0.5</mu2>
+    <kp>1e6</kp>
+    <kd>100</kd>
+    <visual>
+      <material>
+        <ambient>0.30 0.35 0.25 1.0</ambient>
+        <diffuse>0.30 0.35 0.25 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+        <pbr>
+          <metal>
+            <albedo>0.30 0.35 0.25 1.0</albedo>
+            <metalness>0.2</metalness>
+            <roughness>0.5</roughness>
+          </metal>
+        </pbr>
+      </material>
+    </visual>
+  </gazebo>
+
+
+  <!-- ================================================================== -->
+  <!-- 3. REAR DRIVE WHEELS (invisible, HIGH friction — powered)            -->
+  <!-- ================================================================== -->
+
+  <!-- Rear Left Drive Sprocket -->
+  <link name="rear_left_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${drive_wheel_mass}"/>
+      <origin xyz="0 0 0"/>
+      <inertia
+        ixx="${(1.0/12.0) * drive_wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        ixy="0" ixz="0"
+        iyy="${(1.0/12.0) * drive_wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        iyz="0"
+        izz="${0.5 * drive_wheel_mass * wheel_radius * wheel_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="rear_left_wheel_link"/>
+    <origin xyz="${rear_x} ${wheel_y_offset} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.5" friction="1.0"/>
+    <limit effort="200.0" velocity="20.0"/>
+  </joint>
+
+  <gazebo reference="rear_left_wheel_link">
+    <mu1>3.0</mu1>
+    <mu2>1.5</mu2>
+    <kp>1e7</kp>
+    <kd>100</kd>
+    <fdir1>1 0 0</fdir1>
+  </gazebo>
+
+  <!-- Rear Right Drive Sprocket -->
+  <link name="rear_right_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${drive_wheel_mass}"/>
+      <origin xyz="0 0 0"/>
+      <inertia
+        ixx="${(1.0/12.0) * drive_wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        ixy="0" ixz="0"
+        iyy="${(1.0/12.0) * drive_wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        iyz="0"
+        izz="${0.5 * drive_wheel_mass * wheel_radius * wheel_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="rear_right_wheel_link"/>
+    <origin xyz="${rear_x} ${-wheel_y_offset} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.5" friction="1.0"/>
+    <limit effort="200.0" velocity="20.0"/>
+  </joint>
+
+  <gazebo reference="rear_right_wheel_link">
+    <mu1>3.0</mu1>
+    <mu2>1.5</mu2>
+    <kp>1e7</kp>
+    <kd>100</kd>
+    <fdir1>1 0 0</fdir1>
+  </gazebo>
+
+
+  <!-- ================================================================== -->
+  <!-- 4. PASSIVE WHEELS (invisible, LOW friction — support vehicle)        -->
+  <!-- ================================================================== -->
+
+  <!-- Middle pair -->
+  <xacro:passive_wheel name="mid_left_wheel"    x_pos="${mid_x}"   y_pos="${wheel_y_offset}"/>
+  <xacro:passive_wheel name="mid_right_wheel"   x_pos="${mid_x}"   y_pos="${-wheel_y_offset}"/>
+
+  <!-- Front pair (idlers) -->
+  <xacro:passive_wheel name="front_left_wheel"  x_pos="${front_x}" y_pos="${wheel_y_offset}"/>
+  <xacro:passive_wheel name="front_right_wheel" x_pos="${front_x}" y_pos="${-wheel_y_offset}"/>
+
+
+  <!-- ================================================================== -->
+  <!-- 5. SENSOR: Velodyne VLP-16 Puck                                     -->
+  <!-- ================================================================== -->
+  <!-- Placed on top of the vehicle (above turret)                         -->
+  <!-- VLP-16 specs: 16 channels, ±15° VFOV, 360° HFOV, 100m range       -->
+  <!-- 1800 horizontal samples = 0.2° angular resolution                   -->
+  <!-- Total points per scan: 1800 × 16 = 28,800                          -->
+
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <!-- REAR MIDDLE MAST (Shortened to 1m) -->
+    <!-- Rear deck Z ~ 0.17m. Mast 1.0m. LiDAR Z = 1.20m -->
+    <origin xyz="-0.80 0.0 1.20" rpy="0 0 0"/>
+  </joint>
+
+  <link name="lidar_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.07"/>
+      </geometry>
+      <material name="vlp16_dark">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+    <!-- MAST STAND (1.0m) -->
+    <visual>
+      <!-- Length 1.0m, origin at -0.5 (goes down from Z=1.20 to Z=0.20) -->
+      <!-- Passes through deck at Z=0.17 -->
+      <origin xyz="0 0 -0.50" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.04" length="1.0"/>
+      </geometry>
+       <material name="vlp16_mount">
+        <color rgba="0.3 0.3 0.3 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.05" length="0.07"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.5"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+
+  <!-- ================================================================== -->
+  <!-- 6. CAMERAS: 4x ZED 2i Depth Cameras                                 -->
+  <!-- ================================================================== -->
+
+  <!-- MACRO: ZED Camera (Visual + Sensor) -->
+  <xacro:macro name="zed_camera" params="name x y z r p yaw mast_height:=0">
+    <link name="${name}_link">
+      <visual>
+        <geometry>
+          <!-- ZED 2i dims: 175 x 30 x 33 mm approx -->
+          <box size="0.033 0.175 0.03"/>
+        </geometry>
+        <material name="zed_black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.033 0.175 0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.2"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+
+      <!-- OPTIONAL MAST -->
+      <xacro:if value="${mast_height > 0}">
+        <visual>
+          <origin xyz="0 0 ${-mast_height/2}" rpy="0 0 0"/>
+          <geometry>
+            <cylinder radius="0.02" length="${mast_height}"/>
+          </geometry>
+          <material name="mast_grey">
+            <color rgba="0.5 0.5 0.5 1.0"/>
+          </material>
+        </visual>
+      </xacro:if>
+    </link>
+
+    <joint name="${name}_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${name}_link"/>
+      <origin xyz="${x} ${y} ${z}" rpy="${r} ${p} ${yaw}"/>
+    </joint>
+
+    <gazebo reference="${name}_link">
+      <!-- 1. RGB CAMERA SENSOR -->
+      <sensor name="${name}_rgb_sensor" type="camera">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <camera>
+          <horizontal_fov>1.91986</horizontal_fov> <!-- 110 degrees -->
+          <image>
+            <width>640</width>
+            <height>360</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.3</near>
+            <far>20.0</far>
+          </clip>
+        </camera>
+        <topic>${name}/rgb/image_raw</topic>
+        <topic_camera_info>${name}/rgb/camera_info</topic_camera_info>
+      </sensor>
+
+      <!-- 2. DEPTH CAMERA SENSOR (Only for Depth Map) -->
+      <sensor name="${name}_depth_sensor" type="depth_camera">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <camera>
+          <horizontal_fov>1.91986</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>360</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip>
+            <near>0.3</near>
+            <far>20.0</far>
+          </clip>
+        </camera>
+        <!-- Use main topic for depth output in this split configuration -->
+        <topic>${name}/depth/image_raw</topic>
+        <topic_camera_info>${name}/depth/camera_info</topic_camera_info>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- INSTANTIATE CAMERAS -->
+  <!-- Storage Area: Rear Bed (-0.1 to -1.0) -->
+  <!-- Increased Mast to 0.6m to clear bed walls (Total Z ~ 1.0m) -->
+  
+  <!-- Front: Moved to Front Deck (X=0.85) as requested -->
+  <xacro:zed_camera name="front_camera" x="0.85" y="0.0" z="1.30" r="0" p="0" yaw="0" mast_height="0.6"/>
+
+  <!-- Rear: Rear of Bed (X=-1.0) -->
+  <xacro:zed_camera name="rear_camera" x="-1.0" y="0.0" z="0.80" r="0" p="0" yaw="${pi}" mast_height="0.6"/>
+
+  <!-- Left: Center of UGV (X=0.0), Side (Y=0.85), Height 1.30 (Clearance) -->
+  <xacro:zed_camera name="left_camera" x="0.0" y="0.85" z="1.30" r="0" p="0" yaw="${pi/2}" mast_height="0.9"/>
+
+  <!-- Right: Center of UGV (X=0.0), Side (Y=-0.85), Height 1.30 -->
+  <xacro:zed_camera name="right_camera" x="0.0" y="-0.85" z="1.30" r="0" p="0" yaw="${-pi/2}" mast_height="0.9"/>
+
+
+  <!-- ================================================================== -->
+  <!-- 7. GZ FORTRESS PLUGINS                                              -->
+  <!-- ================================================================== -->
+
+  <!-- Diff Drive: rear sprockets only -->
+  <gazebo>
+    <plugin filename="ignition-gazebo-diff-drive-system" name="ignition::gazebo::systems::DiffDrive">
+      <left_joint>rear_left_wheel_joint</left_joint>
+      <right_joint>rear_right_wheel_joint</right_joint>
+      <wheel_separation>${wheel_y_offset * 2.0}</wheel_separation>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+      <max_linear_acceleration>5.0</max_linear_acceleration>
+      <min_linear_acceleration>-5.0</min_linear_acceleration>
+      <max_angular_acceleration>4.0</max_angular_acceleration>
+      <min_angular_acceleration>-4.0</min_angular_acceleration>
+      <max_linear_velocity>6.0</max_linear_velocity>
+      <max_angular_velocity>4.0</max_angular_velocity>
+      <topic>cmd_vel</topic>
+      <odom_topic>odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+  </gazebo>
+
+  <!-- Joint State Publisher -->
+  <gazebo>
+    <plugin filename="ignition-gazebo-joint-state-publisher-system" name="ignition::gazebo::systems::JointStatePublisher">
+      <joint_name>rear_left_wheel_joint</joint_name>
+      <joint_name>rear_right_wheel_joint</joint_name>
+      <joint_name>mid_left_wheel_joint</joint_name>
+      <joint_name>mid_right_wheel_joint</joint_name>
+      <joint_name>front_left_wheel_joint</joint_name>
+      <joint_name>front_right_wheel_joint</joint_name>
+      <update_rate>50</update_rate>
+      <topic>joint_states</topic>
+    </plugin>
+  </gazebo>
+
+  <!-- Velodyne VLP-16 Puck (gpu_lidar) -->
+  <gazebo reference="lidar_link">
+    <sensor name="velodyne_lidar" type="gpu_lidar">
+      <pose>0 0 0 0 0 0</pose>
+      <always_on>true</always_on>
+      <update_rate>10</update_rate>
+      <visualize>true</visualize>
+      <topic>lidar/points</topic>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>1800</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159265</min_angle>
+            <max_angle>3.14159265</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>16</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2618</min_angle>
+            <max_angle>0.2618</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.1</min>
+          <max>100.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.008</stddev>
+        </noise>
+      </ray>
+    </sensor>
+  </gazebo>
+
+</robot>

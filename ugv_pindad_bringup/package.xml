@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<!-- ====================================================================== -->
+<!-- UGV Pindad Bringup — Package Manifest                                  -->
+<!-- ROS2 Humble package for skid-steer UGV simulation with Gazebo          -->
+<!-- ====================================================================== -->
+<package format="3">
+  <name>ugv_pindad_bringup</name>
+  <version>1.0.0</version>
+  <description>
+    UGV Pindad skid-steer (tank-style) simulation package.
+    Provides Gazebo simulation, WASD keyboard teleop, and PyQt5 control GUI.
+  </description>
+  <maintainer email="irman@ugv.dev">Irman</maintainer>
+  <license>MIT</license>
+
+  <!-- Build system -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Runtime dependencies -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

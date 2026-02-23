@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== -->
+<!-- UGV Pindad — URDF/Xacro Robot Description                              -->
+<!-- ====================================================================== -->
+<!-- Tracked UGV with rear drive sprockets.                                  -->
+<!-- The STL mesh provides visual appearance. Physically, 2 rear drive      -->
+<!-- wheels (sprockets) + 2 front caster-like spheres provide ground        -->
+<!-- contact. The diff_drive plugin drives the rear wheels for skid-steer.  -->
+<!-- ====================================================================== -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ugv_pindad">
+
+  <!-- ================================================================== -->
+  <!-- PARAMETERS                                                          -->
+  <!-- ================================================================== -->
+  <xacro:property name="chassis_length"   value="2.39"/>
+  <xacro:property name="chassis_width"    value="2.31"/>
+  <xacro:property name="chassis_mass"     value="200.0"/>
+
+  <!-- Drive wheel (rear sprocket) properties -->
+  <xacro:property name="wheel_radius"     value="0.25"/>
+  <xacro:property name="wheel_width"      value="0.30"/>
+  <xacro:property name="wheel_mass"       value="15.0"/>
+
+  <!-- Front caster (passive support) properties -->
+  <xacro:property name="caster_radius"    value="0.25"/>
+  <xacro:property name="caster_mass"      value="5.0"/>
+
+  <!-- Wheel placement offsets from base_link center -->
+  <xacro:property name="rear_x_offset"    value="-0.80"/>
+  <xacro:property name="front_x_offset"   value="0.80"/>
+  <xacro:property name="wheel_y_offset"   value="0.85"/>
+
+  <!-- STL mesh scale & centering -->
+  <xacro:property name="mesh_scale"       value="0.001 0.001 0.001"/>
+  <xacro:property name="mesh_origin_x"    value="-1.195"/>
+  <xacro:property name="mesh_origin_y"    value="-1.154"/>
+  <xacro:property name="mesh_origin_z"    value="0.0"/>
+
+
+  <!-- ================================================================== -->
+  <!-- BASE FOOTPRINT — Ground-plane reference                            -->
+  <!-- ================================================================== -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child  link="base_link"/>
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+  </joint>
+
+
+  <!-- ================================================================== -->
+  <!-- BASE LINK — Main chassis body                                      -->
+  <!-- ================================================================== -->
+  <link name="base_link">
+    <!-- Visual: STL mesh -->
+    <visual>
+      <origin xyz="${mesh_origin_x} ${mesh_origin_y} ${mesh_origin_z}" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find ugv_pindad_bringup)/meshes/UGV.stl" scale="${mesh_scale}"/>
+      </geometry>
+      <material name="military_green">
+        <color rgba="0.30 0.35 0.25 1.0"/>
+      </material>
+    </visual>
+
+    <!-- NO chassis collision box — only wheels touch the ground -->
+    <!-- This prevents the chassis from dragging and tumbling -->
+
+    <inertial>
+      <mass value="${chassis_mass}"/>
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <inertia
+        ixx="${(1.0/12.0) * chassis_mass * (chassis_width * chassis_width + 1.0)}"
+        ixy="0" ixz="0"
+        iyy="${(1.0/12.0) * chassis_mass * (chassis_length * chassis_length + 1.0)}"
+        iyz="0"
+        izz="${(1.0/12.0) * chassis_mass * (chassis_length * chassis_length + chassis_width * chassis_width)}"/>
+    </inertial>
+  </link>
+
+  <gazebo reference="base_link">
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+
+  <!-- ================================================================== -->
+  <!-- REAR DRIVE WHEELS (sprockets) — These propel the vehicle           -->
+  <!-- ================================================================== -->
+  <link name="rear_left_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${wheel_mass}"/>
+      <origin xyz="0 0 0"/>
+      <inertia
+        ixx="${(1.0/12.0) * wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        ixy="0" ixz="0"
+        iyy="${(1.0/12.0) * wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        iyz="0"
+        izz="${0.5 * wheel_mass * wheel_radius * wheel_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="rear_left_wheel_link"/>
+    <origin xyz="${rear_x_offset} ${wheel_y_offset} 0" rpy="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <dynamics damping="10.0" friction="10.0"/>
+  </joint>
+
+  <link name="rear_right_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${wheel_mass}"/>
+      <origin xyz="0 0 0"/>
+      <inertia
+        ixx="${(1.0/12.0) * wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        ixy="0" ixz="0"
+        iyy="${(1.0/12.0) * wheel_mass * (3.0 * wheel_radius * wheel_radius + wheel_width * wheel_width)}"
+        iyz="0"
+        izz="${0.5 * wheel_mass * wheel_radius * wheel_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="rear_right_wheel_link"/>
+    <origin xyz="${rear_x_offset} ${-wheel_y_offset} 0" rpy="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <dynamics damping="10.0" friction="10.0"/>
+  </joint>
+
+  <!-- Gazebo friction for rear drive wheels — high friction for traction -->
+  <gazebo reference="rear_left_wheel_link">
+    <mu1>1.5</mu1>
+    <mu2>1.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+  </gazebo>
+  <gazebo reference="rear_right_wheel_link">
+    <mu1>1.5</mu1>
+    <mu2>1.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+  </gazebo>
+
+
+  <!-- ================================================================== -->
+  <!-- FRONT PASSIVE CASTERS — Support the front of the vehicle           -->
+  <!-- ================================================================== -->
+  <!-- These are free-spinning spheres that let the front glide freely.   -->
+  <!-- Like the idler wheels at the front of a real tank.                 -->
+  <!-- Low friction so they don't fight the rear drive wheels.            -->
+  <!-- ================================================================== -->
+  <link name="front_left_caster_link">
+    <collision>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${caster_mass}"/>
+      <inertia ixx="${(2.0/5.0)*caster_mass*caster_radius*caster_radius}"
+               ixy="0" ixz="0"
+               iyy="${(2.0/5.0)*caster_mass*caster_radius*caster_radius}"
+               iyz="0"
+               izz="${(2.0/5.0)*caster_mass*caster_radius*caster_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="front_left_caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="front_left_caster_link"/>
+    <origin xyz="${front_x_offset} ${wheel_y_offset} 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="front_right_caster_link">
+    <collision>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${caster_mass}"/>
+      <inertia ixx="${(2.0/5.0)*caster_mass*caster_radius*caster_radius}"
+               ixy="0" ixz="0"
+               iyy="${(2.0/5.0)*caster_mass*caster_radius*caster_radius}"
+               iyz="0"
+               izz="${(2.0/5.0)*caster_mass*caster_radius*caster_radius}"/>
+    </inertial>
+  </link>
+
+  <joint name="front_right_caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="front_right_caster_link"/>
+    <origin xyz="${front_x_offset} ${-wheel_y_offset} 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Front casters: very low friction so they slide freely -->
+  <gazebo reference="front_left_caster_link">
+    <mu1>0.01</mu1>
+    <mu2>0.01</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+  </gazebo>
+  <gazebo reference="front_right_caster_link">
+    <mu1>0.01</mu1>
+    <mu2>0.01</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+  </gazebo>
+
+
+  <!-- ================================================================== -->
+  <!-- GAZEBO DIFF-DRIVE PLUGIN — Rear Sprocket Drive                     -->
+  <!-- ================================================================== -->
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+        <remapping>cmd_vel:=cmd_vel</remapping>
+        <remapping>odom:=odom</remapping>
+      </ros>
+
+      <num_wheel_pairs>1</num_wheel_pairs>
+
+      <left_joint>rear_right_wheel_joint</left_joint>
+      <right_joint>rear_left_wheel_joint</right_joint>
+
+      <wheel_separation>${wheel_y_offset * 2.0}</wheel_separation>
+      <wheel_diameter>${wheel_radius * 2.0}</wheel_diameter>
+
+      <max_wheel_torque>100.0</max_wheel_torque>
+      <max_wheel_acceleration>3.0</max_wheel_acceleration>
+
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+
+      <update_rate>50.0</update_rate>
+    </plugin>
+  </gazebo>
+
+  <!-- ================================================================== -->
+  <!-- GAZEBO JOINT STATE PUBLISHER                                        -->
+  <!-- ================================================================== -->
+  <gazebo>
+    <plugin name="joint_states" filename="libgazebo_ros_joint_state_publisher.so">
+      <ros>
+        <remapping>~/out:=joint_states</remapping>
+      </ros>
+      <joint_name>rear_left_wheel_joint</joint_name>
+      <joint_name>rear_right_wheel_joint</joint_name>
+      <update_rate>50</update_rate>
+    </plugin>
+  </gazebo>
+
+
+</robot>

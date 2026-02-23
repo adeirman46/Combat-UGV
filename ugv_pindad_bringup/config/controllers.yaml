@@ -1,0 +1,118 @@
+# ============================================================================
+# UGV Pindad — Controller Configuration
+# ============================================================================
+# Configuration for ros2_control controller manager running inside Gazebo.
+#
+# Controllers:
+#   1. joint_state_broadcaster — publishes /joint_states for all wheel joints
+#   2. diff_drive_controller  — skid-steer (tank) drive controller
+#
+# Skid-Steer Behavior:
+#   - Left wheels and right wheels are grouped separately
+#   - Commanding positive angular.z → left wheels slower, right wheels faster
+#   - Equal speed on both sides → straight line motion
+#   - Opposite speeds → pivot turn (zero-radius rotation)
+# ============================================================================
+
+# --------------------------------------------------------------------------
+# Controller Manager — top-level configuration
+# --------------------------------------------------------------------------
+controller_manager:
+  ros__parameters:
+    # Controller update rate in Hz (how often controllers compute outputs)
+    update_rate: 100
+
+    # Declare available controllers and their types
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    diff_drive_controller:
+      type: diff_drive_controller/DiffDriveController
+
+
+# --------------------------------------------------------------------------
+# Diff Drive Controller — skid-steer configuration
+# --------------------------------------------------------------------------
+# The diff_drive_controller treats left/right wheel groups independently.
+# For skid-steer (tank) drive:
+#   - All left wheels spin together at the same velocity
+#   - All right wheels spin together at the same velocity
+#   - Differential velocity between left/right causes turning
+#   - Equal but opposite velocities cause pivot (zero-radius) turning
+# --------------------------------------------------------------------------
+diff_drive_controller:
+  ros__parameters:
+    # ---- Wheel Joint Assignments ----
+    # Left-side wheels (front + rear) — both driven at same speed
+    left_wheel_names:
+      - "front_left_wheel_joint"
+      - "rear_left_wheel_joint"
+
+    # Right-side wheels (front + rear) — both driven at same speed
+    right_wheel_names:
+      - "front_right_wheel_joint"
+      - "rear_right_wheel_joint"
+
+    # ---- Wheel Geometry ----
+    # Distance between left and right wheel contact patches (meters)
+    wheel_separation: 1.90
+
+    # Radius of each wheel (meters)
+    wheel_radius: 0.35
+
+    # Multipliers to fine-tune separation/radius if model differs from real
+    wheel_separation_multiplier: 1.0
+    wheel_radius_multiplier: 1.0
+
+    # ---- Odometry Configuration ----
+    # Frame IDs for the published odometry transform
+    odom_frame_id: "odom"
+    base_frame_id: "base_footprint"
+
+    # Publish odom→base_footprint TF transform
+    enable_odom_tf: true
+
+    # Odometry publishing rate (Hz)
+    publish_rate: 50.0
+
+    # Velocity estimation source: use encoder feedback (not open-loop)
+    open_loop: false
+
+    # Pose covariance diagonal [x, y, z, roll, pitch, yaw]
+    pose_covariance_diagonal:   [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal:  [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+
+    # ---- Command Velocity Config ----
+    # Use unstamped Twist messages (geometry_msgs/Twist)
+    use_stamped_vel: false
+
+    # ---- Velocity & Acceleration Limits ----
+    # Maximum linear velocity (m/s) — forward/backward
+    linear.x.has_velocity_limits: true
+    linear.x.max_velocity: 3.0
+    linear.x.min_velocity: -3.0
+
+    # Maximum linear acceleration (m/s²)
+    linear.x.has_acceleration_limits: true
+    linear.x.max_acceleration: 2.0
+    linear.x.min_acceleration: -2.0
+
+    # Maximum angular velocity (rad/s) — turning rate
+    angular.z.has_velocity_limits: true
+    angular.z.max_velocity: 2.0
+    angular.z.min_velocity: -2.0
+
+    # Maximum angular acceleration (rad/s²)
+    angular.z.has_acceleration_limits: true
+    angular.z.max_acceleration: 3.0
+    angular.z.min_acceleration: -3.0
+
+    # ---- Command Timeout ----
+    # Stop robot if no command received for this long (seconds)
+    cmd_vel_timeout: 0.5
+
+    # Publish limited velocity feedback
+    publish_cmd: true
+
+    # Preserve turning radius (for skid-steer, usually false)
+    preserve_turning_radius: false

@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<!-- =================================================================================== -->
+<!-- Obstacle World — Gz Fortress (SDF 1.8)                                              -->
+<!-- Large open area (50x50m) with scattered obstacles for LiDAR testing                 -->
+<!-- =================================================================================== -->
+<sdf version="1.8">
+  <world name="obstacle_world">
+
+    <!-- Physics -->
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <!-- Gravity -->
+    <gravity>0 0 -9.81</gravity>
+
+    <!-- Required Gz Systems -->
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="ignition-gazebo-contact-system" name="ignition::gazebo::systems::Contact"/>
+
+    <!-- Lighting -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 20 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground Plane (large) -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>2.0</mu>
+                <mu2>2.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- OBSTACLES — scattered in a large 50x50m area                    -->
+    <!-- ============================================================== -->
+
+    <!-- RED Box — 5m front -->
+    <model name="red_box_front">
+      <pose>5.0 0 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.0 1.0 1.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.0 1.0 1.0</size></box></geometry>
+          <material>
+            <ambient>0.9 0.1 0.1 1</ambient>
+            <diffuse>0.9 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- BLUE Cylinder — 8m front-left -->
+    <model name="blue_cylinder">
+      <pose>8.0 4.0 0.75 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><cylinder><radius>0.5</radius><length>1.5</length></cylinder></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.5</radius><length>1.5</length></cylinder></geometry>
+          <material>
+            <ambient>0.1 0.1 0.9 1</ambient>
+            <diffuse>0.1 0.1 0.9 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- GREEN Cylinder — 10m front-right -->
+    <model name="green_cylinder">
+      <pose>10.0 -5.0 1.0 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><cylinder><radius>0.6</radius><length>2.0</length></cylinder></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.6</radius><length>2.0</length></cylinder></geometry>
+          <material>
+            <ambient>0.1 0.7 0.1 1</ambient>
+            <diffuse>0.1 0.7 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- YELLOW Box — 12m right -->
+    <model name="yellow_box">
+      <pose>3.0 -8.0 0.4 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.8 0.8 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.8 0.8 0.8</size></box></geometry>
+          <material>
+            <ambient>0.9 0.9 0.1 1</ambient>
+            <diffuse>0.9 0.9 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- GREY Wall — 15m ahead -->
+    <model name="wall_far">
+      <pose>15.0 0 1.0 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.3 8.0 2.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.3 8.0 2.0</size></box></geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ORANGE Box — 7m left -->
+    <model name="orange_box">
+      <pose>-2.0 7.0 0.6 0 0 0.3</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.2 1.2 1.2</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.2 1.2 1.2</size></box></geometry>
+          <material>
+            <ambient>0.9 0.5 0.0 1</ambient>
+            <diffuse>0.9 0.5 0.0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- MAGENTA Box — 6m behind -->
+    <model name="magenta_box">
+      <pose>-6.0 -2.0 0.35 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.7 0.7 0.7</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.7 0.7 0.7</size></box></geometry>
+          <material>
+            <ambient>0.8 0.1 0.8 1</ambient>
+            <diffuse>0.8 0.1 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- DARK GREY Building — 20m ahead-right -->
+    <model name="building_far">
+      <pose>20.0 -10.0 2.0 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>4.0 4.0 4.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>4.0 4.0 4.0</size></box></geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- BOUNDARY WALLS — 50m x 50m perimeter (far away)                 -->
+    <!-- ============================================================== -->
+
+    <model name="wall_north">
+      <pose>0 25 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>50 0.3 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>50 0.3 3.0</size></box></geometry>
+          <material>
+            <ambient>0.4 0.4 0.45 1</ambient>
+            <diffuse>0.4 0.4 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_south">
+      <pose>0 -25 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>50 0.3 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>50 0.3 3.0</size></box></geometry>
+          <material>
+            <ambient>0.4 0.4 0.45 1</ambient>
+            <diffuse>0.4 0.4 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_east">
+      <pose>25 0 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.3 50 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.3 50 3.0</size></box></geometry>
+          <material>
+            <ambient>0.4 0.4 0.45 1</ambient>
+            <diffuse>0.4 0.4 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_west">
+      <pose>-25 0 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.3 50 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.3 50 3.0</size></box></geometry>
+          <material>
+            <ambient>0.4 0.4 0.45 1</ambient>
+            <diffuse>0.4 0.4 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
