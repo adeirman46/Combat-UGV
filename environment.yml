@@ -1,0 +1,35 @@
+name: ros2_env
+channels:
+  - conda-forge
+  - robostack-staging
+  - robostack-humble
+dependencies:
+  - python=3.11
+  # --- ROS 2 Humble ---
+  - ros-humble-desktop
+  - ros-humble-navigation2
+  - ros-humble-slam-toolbox
+  - ros-humble-gazebo-ros-pkgs
+  - ros-humble-ros2-control
+  - ros-humble-gazebo-ros2-control
+  - ros-humble-ros-gz
+  - ros-humble-teleop-twist-keyboard
+  - ros-humble-xacro
+  - ros-humble-robot-localization
+  # --- Build Tools ---
+  - colcon-common-extensions
+  - compilers
+  - cmake
+  - make
+  - ninja
+  # --- Libraries ---
+  - numpy
+  - opencv
+  - pynput
+  - pyqt
+  - gnuradio
+  - pip
+  - pip:
+      - torch==2.4.0
+      - torchvision==0.19.0
+      - ultralytics

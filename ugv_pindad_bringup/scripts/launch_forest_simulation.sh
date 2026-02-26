@@ -5,14 +5,9 @@
 # ===================================================================================
 
 # 1. Source the ROS 2 Environment
-# Assume user environment is already set up or try to hook micromamba
-if [ -f "$HOME/micromamba/etc/profile.d/mamba.sh" ]; then
-    source "$HOME/micromamba/etc/profile.d/mamba.sh"
-    micromamba activate ros2_env
-elif [ -f "$HOME/micromamba/etc/profile.d/conda.sh" ]; then
-    source "$HOME/micromamba/etc/profile.d/conda.sh"
-    micromamba activate ros2_env
-fi
+# Use micromamba shell hook for bash (works even if user's login shell is zsh)
+eval "$(micromamba shell hook --shell bash)"
+micromamba activate ros2_env
 
 # 2. Source the Local Workspace
 if [ -f "$HOME/ugv_pindad_real/install/setup.bash" ]; then
