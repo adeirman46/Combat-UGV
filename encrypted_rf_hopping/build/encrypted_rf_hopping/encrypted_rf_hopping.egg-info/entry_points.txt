@@ -1,0 +1,3 @@
+[console_scripts]
+pub_gui = encrypted_rf_hopping.encrypted_rf_hopping_pub_gui:main
+sub_gui = encrypted_rf_hopping.encrypted_rf_hopping_sub_gui:main

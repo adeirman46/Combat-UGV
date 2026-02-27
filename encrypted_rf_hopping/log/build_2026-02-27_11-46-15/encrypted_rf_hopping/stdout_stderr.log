@@ -1,0 +1,37 @@
+running egg_info
+creating build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info
+writing build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/PKG-INFO
+writing dependency_links to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/dependency_links.txt
+writing entry points to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/entry_points.txt
+writing requirements to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/requires.txt
+writing top-level names to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/top_level.txt
+writing manifest file 'build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/SOURCES.txt'
+reading manifest file 'build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/SOURCES.txt'
+writing manifest file 'build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+copying encrypted_rf_hopping/encrypted_rf_hopping_sub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+copying encrypted_rf_hopping/__init__.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+copying encrypted_rf_hopping/encrypted_rf_hopping_pub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+running install
+running install_lib
+creating /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+copying /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping/encrypted_rf_hopping_sub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+copying /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping/__init__.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+copying /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping/encrypted_rf_hopping_pub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+byte-compiling /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping/encrypted_rf_hopping_sub_gui.py to encrypted_rf_hopping_sub_gui.cpython-311.pyc
+byte-compiling /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping/__init__.py to __init__.cpython-311.pyc
+byte-compiling /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping/encrypted_rf_hopping_pub_gui.py to encrypted_rf_hopping_pub_gui.cpython-311.pyc
+running install_data
+creating /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/ament_index/resource_index/packages
+copying resource/encrypted_rf_hopping -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/ament_index/resource_index/packages
+copying package.xml -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/encrypted_rf_hopping
+creating /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/encrypted_rf_hopping/launch
+copying launch/rf_hopping_gui.launch.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/encrypted_rf_hopping/launch
+running install_egg_info
+Copying build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info to /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping-1.0.0-py3.11.egg-info
+running install_scripts
+Installing pub_gui script to /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/encrypted_rf_hopping
+Installing sub_gui script to /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/encrypted_rf_hopping
+writing list of installed files to '/home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/install.log'

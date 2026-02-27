@@ -1,0 +1,39 @@
+[0.563s] Invoking command in '/home/irman/Combat-UGV/encrypted_rf_hopping': CONDA_PROMPT_MODIFIER=(ros2_env) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/prefix_override:/home/irman/micromamba/envs/ros2_env/lib/python3.11/site-packages/colcon_core/task/python/colcon_distutils_commands:/home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages:${PYTHONPATH} /home/irman/micromamba/envs/ros2_env/bin/python3.11 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/encrypted_rf_hopping build --build-base /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build install --record /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/install.log --single-version-externally-managed install_data
+[0.713s] running egg_info
+[0.721s] creating build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info
+[0.721s] writing build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/PKG-INFO
+[0.721s] writing dependency_links to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/dependency_links.txt
+[0.722s] writing entry points to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/entry_points.txt
+[0.722s] writing requirements to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/requires.txt
+[0.722s] writing top-level names to build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/top_level.txt
+[0.722s] writing manifest file 'build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/SOURCES.txt'
+[0.740s] reading manifest file 'build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/SOURCES.txt'
+[0.741s] writing manifest file 'build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info/SOURCES.txt'
+[0.741s] running build
+[0.741s] running build_py
+[0.741s] creating /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+[0.741s] copying encrypted_rf_hopping/encrypted_rf_hopping_sub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+[0.741s] copying encrypted_rf_hopping/__init__.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+[0.741s] copying encrypted_rf_hopping/encrypted_rf_hopping_pub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping
+[0.741s] running install
+[0.744s] running install_lib
+[0.753s] creating /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+[0.753s] copying /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping/encrypted_rf_hopping_sub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+[0.753s] copying /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping/__init__.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+[0.753s] copying /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build/lib/encrypted_rf_hopping/encrypted_rf_hopping_pub_gui.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping
+[0.754s] byte-compiling /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping/encrypted_rf_hopping_sub_gui.py to encrypted_rf_hopping_sub_gui.cpython-311.pyc
+[0.756s] byte-compiling /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping/__init__.py to __init__.cpython-311.pyc
+[0.756s] byte-compiling /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping/encrypted_rf_hopping_pub_gui.py to encrypted_rf_hopping_pub_gui.cpython-311.pyc
+[0.757s] running install_data
+[0.757s] creating /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/ament_index/resource_index/packages
+[0.757s] copying resource/encrypted_rf_hopping -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/ament_index/resource_index/packages
+[0.758s] copying package.xml -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/encrypted_rf_hopping
+[0.758s] creating /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/encrypted_rf_hopping/launch
+[0.758s] copying launch/rf_hopping_gui.launch.py -> /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/share/encrypted_rf_hopping/launch
+[0.758s] running install_egg_info
+[0.767s] Copying build/encrypted_rf_hopping/encrypted_rf_hopping.egg-info to /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages/encrypted_rf_hopping-1.0.0-py3.11.egg-info
+[0.768s] running install_scripts
+[0.787s] Installing pub_gui script to /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/encrypted_rf_hopping
+[0.787s] Installing sub_gui script to /home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/encrypted_rf_hopping
+[0.787s] writing list of installed files to '/home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/install.log'
+[0.804s] Invoked command in '/home/irman/Combat-UGV/encrypted_rf_hopping' returned '0': CONDA_PROMPT_MODIFIER=(ros2_env) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/prefix_override:/home/irman/micromamba/envs/ros2_env/lib/python3.11/site-packages/colcon_core/task/python/colcon_distutils_commands:/home/irman/Combat-UGV/encrypted_rf_hopping/install/encrypted_rf_hopping/lib/python3.11/site-packages:${PYTHONPATH} /home/irman/micromamba/envs/ros2_env/bin/python3.11 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/encrypted_rf_hopping build --build-base /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/build install --record /home/irman/Combat-UGV/encrypted_rf_hopping/build/encrypted_rf_hopping/install.log --single-version-externally-managed install_data

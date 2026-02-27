@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: encrypted_rf_hopping
+Version: 1.0.0
+Summary: AES-256 Encrypted ROS2 Pub/Sub with GNU Radio Anti-Jam Frequency Hopping
+Maintainer: irman
+Maintainer-email: irman@local.host
+License: GPL-3.0
+Requires-Dist: setuptools
+Dynamic: license
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: requires-dist
+Dynamic: summary

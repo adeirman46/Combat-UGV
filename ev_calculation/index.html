@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV UGV Power & Battery Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar: Inputs -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>EV Calculator</h2>
+                <p>Customize UGV Specifications</p>
+            </div>
+            
+            <form id="calc-form" class="input-form">
+                <div class="input-group">
+                    <label for="mass">Total Mass (kg)</label>
+                    <input type="number" id="mass" value="600" step="any" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="v_max">Max Speed (km/h)</label>
+                    <input type="number" id="v_max" value="30" step="any" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="slope">Max Slope (%)</label>
+                    <input type="number" id="slope" value="60" step="any" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="motors">Number of Motors</label>
+                    <input type="number" id="motors" value="2" step="1" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="duration">Max Duration (hours)</label>
+                    <input type="number" id="duration" value="15" step="any" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="v_avg">Avg Patrol Speed (km/h)</label>
+                    <input type="number" id="v_avg" value="20" step="any" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="c_rr">Rolling Resistance (C_rr)</label>
+                    <input type="number" id="c_rr" value="0.08" step="any" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="p_aux">Additional Components (kW)</label>
+                    <input type="number" id="p_aux" value="1.0" step="any" required>
+                </div>
+
+                <button type="button" class="btn btn-primary" id="btn-calculate">Calculate</button>
+            </form>
+        </aside>
+
+        <!-- Main Content: Outputs -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Performance & Energy Analysis</h1>
+                <button class="btn btn-export" id="btn-export">Export to PDF</button>
+            </header>
+
+            <div class="results-container" id="report-content">
+                <div class="report-header">
+                    <h2>EV UGV Power and Battery Calculation</h2>
+                    <p class="subtitle">Generated Report</p>
+                </div>
+
+                <!-- 1. Physics of Slope Climbing -->
+                <section class="result-section">
+                    <h3>1. Physics of Slope Climbing</h3>
+                    <div class="card-grid">
+                        <div class="result-card">
+                            <h4>Slope Angle (&theta;)</h4>
+                            <div class="val-box"><span id="out-theta">0.00</span>&deg;</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Gravitational Force (F<sub>g</sub>)</h4>
+                            <div class="val-box"><span id="out-fg">0.00</span> N</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Rolling Resistance (F<sub>rr</sub>)</h4>
+                            <div class="val-box"><span id="out-frr">0.00</span> N</div>
+                        </div>
+                        <div class="result-card highlight">
+                            <h4>Total Resistance (F<sub>total</sub>)</h4>
+                            <div class="val-box"><span id="out-ftotal">0.00</span> N</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Motor Power Calculation -->
+                <section class="result-section">
+                    <h3>2. Motor Power Calculation</h3>
+                    <div class="card-grid">
+                        <div class="result-card">
+                            <h4>Total Motion Power (P<sub>motion</sub>)</h4>
+                            <div class="val-box"><span id="out-pmotion">0.00</span> kW</div>
+                        </div>
+                        <div class="result-card highlight">
+                            <h4>Min. Power per Motor</h4>
+                            <div class="val-box"><span id="out-pmotor">0.00</span> kW</div>
+                            <p class="card-note">For <span id="out-motor-count">2</span> motors to climb <span id="out-slope-disp">60</span>% slope at <span id="out-vmax-disp">30</span> km/h</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Battery Capacity -->
+                <section class="result-section">
+                    <h3>3. Battery Capacity and Endurance (Flat Terrain)</h3>
+                    <div class="card-grid">
+                        <div class="result-card">
+                            <h4>Avg Motion Power</h4>
+                            <div class="val-box"><span id="out-pavg">0.00</span> kW</div>
+                            <p class="card-note">At <span id="out-vavg-disp">20</span> km/h</p>
+                        </div>
+                        <div class="result-card">
+                            <h4>Total Avg Power</h4>
+                            <div class="val-box"><span id="out-ptot-avg">0.00</span> kW</div>
+                            <p class="card-note">Includes <span id="out-paux-disp">1</span> kW aux.</p>
+                        </div>
+                        <div class="result-card highlight">
+                            <h4>Req. Energy Capacity</h4>
+                            <div class="val-box"><span id="out-ebatt">0.00</span> kWh</div>
+                            <p class="card-note">For <span id="out-dur-disp">15</span> hours</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Max Distance & Summary -->
+                <section class="result-section">
+                    <h3>4. Summary of Specifications</h3>
+                    <div class="summary-list">
+                        <div class="summary-item">
+                            <span class="label">Total Motor Power Needs</span>
+                            <span class="value"><span id="sum-pmotion">0.00</span> kW</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Power per Motor (Peak)</span>
+                            <span class="value"><span id="sum-pmotor">0.00</span> kW</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Battery Energy Capacity</span>
+                            <span class="value"><span id="sum-ebatt">0.00</span> kWh</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Maximum Range</span>
+                            <span class="value"><span id="sum-dist">0.00</span> km</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
