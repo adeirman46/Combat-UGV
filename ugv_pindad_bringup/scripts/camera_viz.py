@@ -209,16 +209,20 @@ class RosThread(QThread):
 
     def lidar_callback(self, msg):
         try:
-            data = np.frombuffer(msg.data, dtype=np.float32)
-            floats_per_point = msg.point_step // 4
-            num_points = msg.width * msg.height
-            if len(data) >= num_points * floats_per_point:
-                reshaped = data.reshape(-1, floats_per_point)
-                xy = reshaped[::5, :2] 
-                points = xy.tolist()
-                self.update_lidar.emit(points)
-        except:
-            pass
+            # We must use proper PointCloud2 parsing because Gazebo 
+            # packs fields (x,y,z,intensity,ring) differently
+            import sensor_msgs_py.point_cloud2 as pc2
+            
+            # Read only X and Y, skip every 10th point to save CPU
+            points_iter = pc2.read_points(msg, field_names=("x", "y"), skip_nans=True)
+            
+            # Convert to list but subset it
+            all_points = list(points_iter)
+            subset = all_points[::10]
+            
+            self.update_lidar.emit(subset)
+        except Exception as e:
+            print(f"[ERROR] Lidar parse error: {e}", flush=True)
 
     def run(self):
         try:
